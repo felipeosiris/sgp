@@ -1,0 +1,86 @@
+.billing-summary-container {
+  background-color: white;
+  padding: 0px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h2 {
+  color: #3A0092;
+  font-size: 24px;
+}
+
+.search-container {
+  position: relative;
+  width: 250px;
+
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 40px 10px 20px; // Espacio para el ícono de la lupa
+    border: 1px solid #c0c6cc;
+    border-radius: 20px;
+    outline: none;
+    font-size: 16px;
+    color: #828282;
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #828282;
+    padding: 0;
+  }
+}
+
+.table {
+  .table-header {
+    display: grid;
+    grid-template-columns: 4fr 2fr 2fr 2fr;
+    gap: 10px;
+    color: #B0BEC5;
+    padding: 10px 0;
+    margin-right: 50px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 4fr 2fr 2fr 2fr;
+    gap: 10px;
+    padding: 10px 0;
+    margin-right: 50px;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+
+    a {
+      color: #00AAFF;
+      text-decoration: none;
+      font-size: 12px;
+    }
+
+    .due-date {
+      color: #D52929;
+      font-size: 12px;
+    }
+
+    .general-info {
+      color: #474747;
+      font-size: 12px;
+    }
+  }
+}

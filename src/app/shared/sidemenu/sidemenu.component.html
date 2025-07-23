@@ -1,0 +1,78 @@
+<!-- Navbar lateral completo -->
+<aside 
+  class="flex min-h-[calc(100vh-64px)] w-28 flex-col text-white rounded-l-3xl shadow-2xl backdrop-blur-md bg-white/10 border border-white/20"
+  style="background: linear-gradient(to bottom, rgba(17,38,88,0.9), rgba(68,83,114,0.6)); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);">
+
+  <!-- Logo -->
+  <div class="flex h-[4.5rem] w-full items-center justify-center px-4 pt-12 p-6">
+    <img src="logoTS4.svg" alt="TS4" class="h-12" />
+  </div>
+
+  <!-- Navegación principal -->
+  <nav class="flex flex-1 flex-col gap-4 pt-2 px-2 overflow-y-auto">
+
+    <!-- Botón Home -->
+    <a [routerLink]="'main'" class="flex items-center gap-1.5 p-2 rounded-xl hover:bg-white/10 transition">
+      <img src="timerOn.svg" alt="Home" class="w-5 h-5" />
+      <span style="font-size:10px;">Mi tiempo</span>
+    </a>
+
+    <!-- Botón Inbox -->
+    <a [routerLink]="'inbox-view'" class="flex items-center gap-1.5 p-2 rounded-xl hover:bg-white/10 transition">
+      <img src="inboxOff.svg" alt="Inbox" class="w-5 h-5" />
+      <span style="font-size:10px;">Inbox</span>
+    </a>
+
+    <!-- Separador -->
+    <hr class="border-white/10 my-2" />
+
+    <!-- Botón Proyectos -->
+    <a *ngIf="canViewProyectos()" [routerLink]="'my-projects-view'" class="flex items-center gap-1.5 p-2 rounded-xl hover:bg-white/10 transition">
+      <img src="proyectOFF.svg" alt="Proyectos" class="w-5 h-5" />
+      <span style="font-size:10px;">Proyectos</span>
+    </a>
+
+    <!-- Ítems adicionales como en la imagen -->
+    <a *ngIf="canViewPersonas()" [routerLink]="'personas'" class="flex items-center gap-1.5 p-2 rounded-xl hover:bg-white/10 transition">
+      <img src="peopleOFF.svg" alt="Personas" class="w-5 h-5" />
+      <span style="font-size:10px;">Personas</span>
+    </a>
+
+    <a *ngIf="canViewTiempos()" [routerLink]="'tiempos'" class="flex items-center gap-1.5 p-2 rounded-xl hover:bg-white/10 transition">
+      <img src="clock.svg" alt="Tiempos" class="w-5 h-5" />
+      <span style="font-size:10px;">Tiempos</span>
+    </a>
+
+    <!-- Separador -->
+    <hr class="border-white/10 my-2" />
+
+    <a *ngIf="canViewMiEquipo()" [routerLink]="'mi-equipo'" class="flex items-center gap-1.5 p-2 rounded-xl hover:bg-white/10 transition">
+      <img src="team.svg" alt="Mi equipo" class="w-5 h-5" />
+      <span style="font-size:10px;">Mi equipo</span>
+    </a>
+
+    <a *ngIf="canViewAdmin()" [routerLink]="'admin-view'" class="flex items-center gap-1.5 p-2 rounded-xl hover:bg-white/10 transition">
+      <img src="adminPanel.svg" alt="Admin" class="w-5 h-5" />
+      <span style="font-size:10px;">Admin</span>
+    </a>
+  </nav>
+
+  <!-- Sección inferior: avatar con notificaciones -->
+  <div class="flex flex-col items-center gap-2 pb-12">
+    <div class="relative">
+      <button class="rounded-full border-2 border-white" (click)="goToNotifications()">
+        <ng-container *ngIf="user as userData">
+          <img [src]="userData.photo" 
+               alt="Usuario" 
+               class="h-10 w-10 rounded-full object-cover"
+               [class.image-loading]="imageLoading"
+               (error)="handleImageError($event)"
+               (load)="handleImageLoad($event)" />
+        </ng-container>
+        <span *ngIf="unreadNotificationsCount > 0" class="notification-badge">
+          {{ unreadNotificationsCount }}
+        </span>
+      </button>
+    </div>
+  </div>
+</aside>

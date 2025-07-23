@@ -1,0 +1,96 @@
+<!-- Vista de Proyectos -->
+<div class="mx-auto grid grid-cols-12 gap-4 p-1">
+  <div class="header col-span-12 flex items-center rounded-lg p-4 sm:col-span-12">
+    <h1 class="text-2xl font-bold text-left mr-2 flex items-center">
+      Proyectos
+    </h1>
+  </div>
+  <div class="col-span-12 rounded-lg p-4 sm:col-span-12">
+    <!-- Tab bar funcional SIEMPRE visible -->
+    <div class="tabs mb-4 border-b-2 border-gray-200 flex">
+      <button class="pb-2 mr-4 font-semibold transition-colors" [ngClass]="{
+          'text-[#00AAFF] border-b-2 border-[#00AAFF]': selectedTab === 'activos',
+          'text-gray-500': selectedTab !== 'activos'
+        }" (click)="selectedTab = 'activos'">
+        Proyectos Activos
+      </button>
+      <button class="pb-2 mr-4 font-semibold transition-colors" [ngClass]="{
+          'text-[#00AAFF] border-b-2 border-[#00AAFF]': selectedTab === 'archivados',
+          'text-gray-500': selectedTab !== 'archivados'
+        }" (click)="selectedTab = 'archivados'">
+        Proyectos Archivados
+      </button>
+    </div>
+    
+    <!-- Indicador de carga -->
+    <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-10 px-4">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00AAFF]"></div>
+      <p class="text-gray-500 mt-4">Cargando proyectos...</p>
+    </div>
+    
+    <!-- Contenido para tabs de Proyectos (Activos y Archivados) -->
+    <ng-container *ngIf="!isLoading && (selectedTab === 'activos' || selectedTab === 'archivados')">
+      <ng-container *ngIf="proyectosFiltrados.length === 0; else tablaProyectos">
+        <div class="flex flex-col items-center justify-center py-10 px-4">
+          <img src="iconEmptyBox.svg" alt="Sin proyectos" class="w-32 h-32 mb-6" />
+          <p class="text-teal-600 font-semibold text-lg mb-1">
+            <ng-container *ngIf="selectedTab === 'activos'">
+              Aún no tienes ningún proyecto activo asignado.
+            </ng-container>
+            <ng-container *ngIf="selectedTab === 'archivados'">
+              Aún no tienes ningún proyecto archivado.
+            </ng-container>
+          </p>
+          <p class="text-gray-500 mb-6">
+            <ng-container *ngIf="selectedTab === 'activos'">
+              Los proyectos que te sean asignados aparecerán aquí
+            </ng-container>
+            <ng-container *ngIf="selectedTab === 'archivados'">
+              Cuando se archiven tus proyectos aparecerán aquí
+            </ng-container>
+          </p>
+        </div>
+      </ng-container>
+      <ng-template #tablaProyectos>
+        <table class="min-w-full divide-y">
+          <thead>
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Nombre</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">ID</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap"># Partidas</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap"># Personas</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Presupuesto</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Presupuesto horas</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Inicio</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Fin</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y">
+            <ng-container *ngFor="let proyecto of proyectosFiltrados">
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-left">
+                  <ng-container *ngIf="selectedTab === 'activos'">
+                    <a [routerLink]="['/home/project-view', proyecto.id]"
+                      class="text-sm font-medium text-[#00AAFF] underline hover:no-underline">
+                      {{ proyecto.nombre }}
+                    </a>
+                  </ng-container>
+                  <ng-container *ngIf="selectedTab === 'archivados'">
+                    <span class="text-sm font-medium text-gray-500">{{ proyecto.nombre }}</span>
+                  </ng-container>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.id }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.partidas }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.personas }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.presupuesto }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.presupuestoReal }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.inicio }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.fin }}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </ng-template>
+    </ng-container>
+  </div>
+</div>

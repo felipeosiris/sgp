@@ -1,0 +1,195 @@
+<!-- component -->
+<div class="mx-auto grid grid-cols-12 gap-4 p-1">
+    <div class="header col-span-12 rounded-lg p-4 sm:col-span-12">
+        <!-- Header content -->
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold mb-2 text-left">Validaciones de mis tiempos</h1>
+        </div>
+    </div>
+    
+    <!-- Tabla de validaciones de colaborador -->
+    <div *ngIf="isCollaborator" class="col-span-12 rounded-lg p-4 sm:col-span-12">
+        <table class="min-w-full divide-y">
+            <thead>
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Líder</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Actividad</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Horas invertidas</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Periodo</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Promedio diario</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Estado</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                <!-- Datos del servicio -->
+                <tr *ngFor="let validacion of validacionesColaborador">
+                    <td class="px-6 py-4 whitespace-nowrap text-left">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <img class="h-10 w-10 rounded-full" 
+                                     [src]="validacion.leaderPhoto || getInitialsAvatar(validacion.leaderName)" 
+                                     [alt]="validacion.leaderName"
+                                     (error)="onImageError($event, validacion.leaderName)">
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">{{ validacion.leaderName }}</div>
+                                <div class="text-sm text-gray-500">{{ validacion.leaderPosition }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ validacion.activity }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ validacion.internalCode }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-500 text-center">{{ formatHours(validacion.dailyAverage * 5) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ formatDateRange(validacion.startDate, validacion.endDate) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ formatDailyAverage(validacion) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
+                              [ngClass]="getApprovalStatusClass(validacion.approvalStatus)">
+                            {{ getApprovalStatusText(validacion.approvalStatus) }}
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tabla de validaciones de administrador/líder -->
+    <div *ngIf="isLeader" class="col-span-12 rounded-lg p-4 sm:col-span-12">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Validaciones de equipo</h2>
+        <table class="min-w-full divide-y">
+            <thead>
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Persona</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Actividad</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Periodo</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Horas totales</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Tiempo extra</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Promedio diario</th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                <tr *ngFor="let validacion of validacionesAdmin">
+                    <td class="px-6 py-4 whitespace-nowrap text-left">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <img class="h-10 w-10 rounded-full border border-gray-200" 
+                                     [src]="validacion.userPhotoUrl || getInitialsAvatar(validacion.userName)" 
+                                     [alt]="validacion.userName"
+                                     (error)="onImageError($event, validacion.userName)">
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">{{ validacion.userName }}</div>
+                                <div class="text-sm text-gray-500">{{ validacion.userPosition || 'Sin posición' }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ validacion.activityName }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ formatDateRange(validacion.startDate, validacion.endDate) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-500 text-center">{{ formatHours(validacion.totalHours) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-500 text-center">{{ formatHours(validacion.totalTXTHours) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ formatAdminDailyAverage(validacion) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <div class="flex justify-center gap-2">
+                            <button class="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200" (click)="openRejectModal(validacion)">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            <button class="p-1 rounded-full bg-green-100 text-green-600 hover:bg-green-200" (click)="openDetailModal(validacion)">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mensaje cuando no hay validaciones -->
+    <div *ngIf="!isCollaborator && !isLeader" class="col-span-12 rounded-lg p-4 sm:col-span-12">
+        <div class="text-center py-8">
+            <p class="text-gray-500 text-lg">No hay validaciones disponibles</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Rechazo -->
+<div *ngIf="showRejectModal" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+  <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md flex flex-col items-center">
+    <img src="https://i.ytimg.com/vi/fSAF_Ro0bhY/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBO3Qu4sLBQF5_vcwf6OBDYHTQ36A" alt="Avatar triste" class="w-24 h-24 rounded-full mb-4 object-cover border-4 border-indigo-200">
+    <h2 class="text-xl font-bold mb-4 text-center text-indigo-700">Rechazar horas registradas</h2>
+    <p class="mb-6 text-center text-gray-700 font-semibold text-lg">
+      Pensé que éramos amigos
+    </p>
+    <div class="flex flex-col gap-2 w-full">
+      <button class="w-full py-2" style="background-color: #4A4ECC; color: white; font-weight: 600; border-radius: 8px;" (click)="updateStatus(false)">
+        Sí, rechazar registro
+      </button>
+      <button class="w-full py-2 border" style="border-color: #4A4ECC; color: #4A4ECC; font-weight: 600; border-radius: 8px;" (click)="closeRejectModal()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalle de Horas -->
+<div *ngIf="showDetailModal && selectedValidation" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+  <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
+    <h2 class="text-xl font-bold mb-4 text-indigo-700">Detalle de horas registradas</h2>
+    <table class="min-w-full divide-y mb-6">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left text-xs font-bold text-black uppercase">Fecha</th>
+          <th class="px-4 py-2 text-center text-xs font-bold text-black uppercase">Total al día</th>
+          <th class="px-4 py-2 text-center text-xs font-bold text-black uppercase">Tiempo x tiempo</th>
+          <th class="px-4 py-2 text-center text-xs font-bold text-black uppercase">Motivo del Tiempo X Tiempo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Aquí deberías iterar sobre los detalles de horas si los tienes, por ahora ejemplo estático -->
+        <tr>
+          <td class="px-4 py-2">10 de abril</td>
+          <td class="px-4 py-2 text-red-500">8 horas</td>
+          <td class="px-4 py-2">N/A</td>
+          <td class="px-4 py-2">---</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2">11 de abril</td>
+          <td class="px-4 py-2 text-red-500">10 horas</td>
+          <td class="px-4 py-2 text-red-500">2 horas</td>
+          <td class="px-4 py-2">Requerimiento del cliente</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2">12 de abril</td>
+          <td class="px-4 py-2 text-red-500">10 horas</td>
+          <td class="px-4 py-2 text-red-500">2 horas</td>
+          <td class="px-4 py-2">Requerimiento del cliente</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2">13 de abril</td>
+          <td class="px-4 py-2 text-red-500">9 horas</td>
+          <td class="px-4 py-2 text-red-500">1 horas</td>
+          <td class="px-4 py-2">Requerimiento del cliente</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2">14 de abril</td>
+          <td class="px-4 py-2">8 horas</td>
+          <td class="px-4 py-2">N/A</td>
+          <td class="px-4 py-2">---</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="flex gap-4 justify-center">
+      <button class="px-6 py-2 border" style="border-color: #4A4ECC; color: #4A4ECC; font-weight: 600; border-radius: 8px; min-width: 261px;" (click)="closeDetailModal()">
+        Cancelar
+      </button>
+      <button class="px-6 py-2" style="background-color: #4A4ECC; color: white; font-weight: 600; border-radius: 8px; min-width: 261px;" (click)="updateStatus(true)">
+        Aprobar
+      </button>
+    </div>
+  </div>
+</div>

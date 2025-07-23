@@ -1,0 +1,24 @@
+<div 
+  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-700"
+  style="background-image: url('login_background.png'), linear-gradient(to bottom right, #1e3a8a, #3730a3, #7c3aed); background-size: cover; background-position: center; background-repeat: no-repeat;"
+>
+  <div class="backdrop-blur-md bg-white/10 border border-white/20 rounded-[22px] shadow-2xl px-8 py-10 max-w-sm w-full flex flex-col items-center"
+    style="box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);">
+    <img src="logo_ts4.png" alt="Ts4 Logo" class="w-32 mb-8 mt-2" />
+
+    <h2 class="text-2xl font-semibold mb-6 text-white tracking-wide">Iniciar sesión</h2>
+
+    <button
+      (click)="signInWithGoogle()"
+      class="flex items-center justify-center w-full max-w-xs border border-white/30 bg-white/20 backdrop-blur-sm rounded-full py-3 px-2 mb-8 hover:shadow-lg transition text-gray-800 font-medium text-base"
+      style="color: #222;"
+    >
+      <img src="logo_google.png" alt="Google" class="w-6 h-6 mr-3" />
+      <span class="font-medium text-base">Continue with Google</span>
+    </button>
+
+    <div class="text-sm text-white/80 mt-2">
+      ¿Problemas? <a href="#" class="underline text-[#B3E0FF] hover:text-[#00AAFF] transition">Contactar soporte</a>
+    </div>
+  </div>
+</div>

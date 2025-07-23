@@ -1,0 +1,104 @@
+<!-- Dashboard para Líder de Proyecto -->
+<div class="min-h-screen bg-white px-20 py-10">
+    <!-- Fila con estadísticas, selector de mes y botón de descarga a la derecha -->
+    <div class="flex items-center justify-between mb-10">
+      <div class="flex gap-x-10 items-center">
+        <div>
+            <p class="text-xs text-gray-500 font-medium">Horas trabajadas Q1</p>
+            <p class="text-xl font-bold text-gray-800">{{generalSummary?.totalHours || '0'}}h</p>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 font-medium">Días de playa promedio</p>
+            <p class="text-xl font-bold text-gray-800">{{generalSummary?.activeProjects || '0'}}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <input type="month" class="border rounded px-2 py-1 text-sm" [(ngModel)]="selectedMonth" name="monthPicker" />
+        <button class="flex items-center text-[#00AAFF] hover:underline border border-[#00AAFF] rounded-lg px-4 py-2 transition disabled:opacity-50" (click)="descargarReporteFinanciero()" [disabled]="isDownloading || !selectedMonth">
+          <img src="/download.svg" alt="Descargar Reporte" class="w-5 h-5 mr-2" />
+          <span class="font-medium text-[#00AAFF] underline hover:no-underline" style="font-size: 14px;">Descargar reporte financiero</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-16">
+        <!-- Proyectos por agotar horas -->
+        <section class="pl-6">
+            <h2 class="text-base font-semibold mb-4">Proyectos por agotar horas</h2>
+            <ul class="space-y-5">
+                <ng-container *ngIf="projectsSummary.length > 0; else emptyProjects">
+                  <li *ngFor="let proyecto of projectsSummary">
+                    <div class="flex items-center gap-3">
+                        <img src="assets/images/logo_google.png" 
+                             [alt]="proyecto.projectName" 
+                             class="w-10 h-10 rounded-full object-cover" />
+                        <div>
+                            <p class="text-sm font-semibold">{{proyecto.projectName}} ID:{{proyecto.projectId}}</p>
+                            <p class="text-xs text-gray-500">{{proyecto.hoursUsed}}h (<b>{{proyecto.pctUsed}}%</b>) de {{proyecto.plannedHours}}h</p>
+                            <div class="h-2 bg-gray-200 rounded-full mt-1">
+                                <div class="h-2 bg-indigo-600 rounded-full" [style.width.%]="proyecto.pctUsed"></div>
+                            </div>
+                        </div>
+                    </div>
+                  </li>
+                </ng-container>
+            </ul>
+            <ng-template #emptyProjects>
+              <div class="flex flex-col items-center justify-center text-center py-8 px-2">
+                <img src="iconEmptyBox.svg" alt="Sin proyectos" class="w-14 h-14 mb-2" />
+                <p class="text-gray-500 text-xs">No hay proyectos por agotar horas.</p>
+              </div>
+            </ng-template>
+        </section>
+
+        <!-- Personas con más horas -->
+        <section>
+            <h2 class="text-base font-semibold mb-4">Personas con más horas</h2>
+            <ul class="space-y-5">
+                <ng-container *ngIf="topUsersSummary.length > 0; else emptyTopUsers">
+                  <li *ngFor="let persona of topUsersSummary" class="flex items-center gap-3">
+                    <img [src]="persona.userPhoto || 'assets/images/profileIcon.svg'" 
+                         [alt]="persona.userName" 
+                         class="w-10 h-10 rounded-full object-cover" />
+                    <div>
+                        <p class="text-sm font-semibold">{{persona.userName}}</p>
+                        <p class="text-xs text-gray-500">{{persona.userPosition}}</p>
+                        <p class="text-xs">{{persona.totalHours || 0}}h (<b>{{persona.pctOfPeriod | number:'1.0-2'}}%</b>) de {{persona.totalPeriodHours}}h</p>
+                    </div>
+                  </li>
+                </ng-container>
+            </ul>
+            <ng-template #emptyTopUsers>
+              <div class="flex flex-col items-center justify-center text-center py-8 px-2">
+                <img src="iconEmptyBox.svg" alt="Sin personas" class="w-14 h-14 mb-2" />
+                <p class="text-gray-500 text-xs">No hay personas con más horas.</p>
+              </div>
+            </ng-template>
+        </section>
+
+        <!-- Personas en playa -->
+        <section>
+            <h2 class="text-base font-semibold mb-4">Personas en playa</h2>
+            <ul class="space-y-5">
+                <ng-container *ngIf="inactiveUsersSummary.length > 0; else emptyInactiveUsers">
+                  <li *ngFor="let persona of inactiveUsersSummary" class="flex items-center gap-3">
+                    <img [src]="persona.userPhoto || 'assets/images/profileIcon.svg'" 
+                         [alt]="persona.userName" 
+                         class="w-10 h-10 rounded-full object-cover" />
+                    <div>
+                        <p class="text-sm font-semibold">{{persona.userName}}</p>
+                        <p class="text-xs text-gray-500">{{persona.userPosition}}</p>
+                        <p class="text-xs" style="color: #1A9BF1;">{{persona.inactiveDays}} días inactivo</p>
+                    </div>
+                  </li>
+                </ng-container>
+            </ul>
+            <ng-template #emptyInactiveUsers>
+              <div class="flex flex-col items-center justify-center text-center py-8 px-2">
+                <img src="iconEmptyBox.svg" alt="Sin personas en playa" class="w-14 h-14 mb-2" />
+                <p class="text-gray-500 text-xs">No hay personas en playa.</p>
+              </div>
+            </ng-template>
+        </section>
+    </div>
+</div> 

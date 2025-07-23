@@ -1,0 +1,211 @@
+<!-- Contenedor principal con grid -->
+<div class="flex">
+  <!-- Panel lateral de filtros -->
+  <div class="w-64 p-6 bg-white">
+    <h2 class="text-xl font-bold mb-6">Filtros</h2>
+    
+    <!-- Estatus -->
+    <div class="mb-6">
+      <h3 class="font-semibold mb-2">Estatus</h3>
+      <div class="flex flex-col gap-2">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="form-checkbox" [(ngModel)]="filtros.conProyecto">
+          <span>Con proyecto</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="form-checkbox" [(ngModel)]="filtros.sinProyecto">
+          <span>Sin proyecto</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Certificado -->
+    <div class="mb-6">
+      <h3 class="font-semibold mb-2">Certificado</h3>
+      <div class="flex flex-col gap-2">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="form-checkbox" [(ngModel)]="filtros.conCertificado">
+          <span>Con certificado</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="form-checkbox" [(ngModel)]="filtros.sinCertificado">
+          <span>Sin certificado</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Vacaciones -->
+    <div class="mb-6">
+      <h3 class="font-semibold mb-2">Vacaciones</h3>
+      <div class="flex flex-col gap-2">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="form-checkbox" [(ngModel)]="filtros.activas">
+          <span>Activas</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="form-checkbox" [(ngModel)]="filtros.inactivas">
+          <span>Inactivas</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Estudiando idiomas -->
+    <div class="mb-6">
+      <h3 class="font-semibold mb-2">Estudiando idiomas</h3>
+      <div class="flex flex-col gap-2">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="form-checkbox" [(ngModel)]="filtros.activas">
+          <span>Activas</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="form-checkbox" [(ngModel)]="filtros.inactivas">
+          <span>Inactivas</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Horas cubiertas -->
+    <div class="mb-6">
+      <h3 class="font-semibold mb-2">Horas cubiertas</h3>
+      <div class="flex flex-col gap-2">
+        <label class="flex items-center gap-2">
+          <input type="radio" class="form-radio" name="horasCubiertas" [(ngModel)]="filtros.horasCubiertas" value="menos50">
+          <span>menos de 50%</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="radio" class="form-radio" name="horasCubiertas" [(ngModel)]="filtros.horasCubiertas" value="menos75">
+          <span>menos de 75%</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="radio" class="form-radio" name="horasCubiertas" [(ngModel)]="filtros.horasCubiertas" value="mas90">
+          <span>más de 90%</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="radio" class="form-radio" name="horasCubiertas" [(ngModel)]="filtros.horasCubiertas" value="mas100">
+          <span>más de 100%</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex flex-col gap-2">
+      <button class="w-full py-2 bg-blue-600 text-white rounded" (click)="aplicarFiltros()">Aplicar</button>
+      <button class="w-full py-2 border border-gray-300 rounded" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="flex-1 p-6">
+    <!-- Estadísticas -->
+    <div class="grid grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-lg p-4 text-center shadow">
+        <div class="text-2xl font-bold">{{estadisticas.totalPersonas}}</div>
+        <div class="text-gray-600">Personas</div>
+      </div>
+      <div class="bg-white rounded-lg p-4 text-center shadow">
+        <div class="text-2xl font-bold">{{estadisticas.enCertificacion}}</div>
+        <div class="text-gray-600">En certificación</div>
+      </div>
+      <div class="bg-white rounded-lg p-4 text-center shadow">
+        <div class="text-2xl font-bold">{{estadisticas.sinProyecto}}</div>
+        <div class="text-gray-600">Sin proyecto</div>
+      </div>
+      <div class="bg-white rounded-lg p-4 text-center shadow">
+        <div class="text-2xl font-bold">{{estadisticas.proyectosActivos}}</div>
+        <div class="text-gray-600">Proyectos activos</div>
+      </div>
+    </div>
+
+    <!-- Tabla de personas -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr class="bg-gray-50">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Personas</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Horas trabajadas</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proyecto</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Certificado</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Idioma</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vacaciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr *ngFor="let persona of personas">
+              <td class="px-6 py-4">
+                <div class="flex items-center">
+                  <span class="inline-block w-1 h-8 rounded mr-2"
+                        [ngStyle]="{'background-color': getRandomColor()}"></span>
+                  <img [src]="getAvatarUrl(persona)" 
+                       [alt]="persona.nombre" 
+                       class="h-10 w-10 rounded-full mr-3"
+                       (error)="handleImageError($event, persona.nombre)">
+                  <div>
+                    <div class="text-sm font-medium text-gray-900">{{persona.nombre}}</div>
+                    <div class="text-sm text-gray-500">{{persona.rol}}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-blue-600 h-2.5 rounded-full" [style.width.%]="persona.porcentaje"></div>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                  {{persona.horas}}h ({{persona.porcentaje}}%) de {{persona.horasMaximas}}h
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full"
+                     [class.bg-green-100]="persona.proyecto"
+                     [class.bg-gray-100]="!persona.proyecto">
+                  <svg *ngIf="persona.proyecto" class="w-5 h-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <svg *ngIf="!persona.proyecto" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full"
+                     [class.bg-green-100]="persona.certificado"
+                     [class.bg-gray-100]="!persona.certificado">
+                  <svg *ngIf="persona.certificado" class="w-5 h-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <svg *ngIf="!persona.certificado" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full"
+                     [class.bg-green-100]="persona.idioma"
+                     [class.bg-gray-100]="!persona.idioma">
+                  <svg *ngIf="persona.idioma" class="w-5 h-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <svg *ngIf="!persona.idioma" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-center w-8 h-8 rounded-full"
+                     [class.bg-green-100]="persona.vacaciones"
+                     [class.bg-gray-100]="!persona.vacaciones">
+                  <svg *ngIf="persona.vacaciones" class="w-5 h-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <svg *ngIf="!persona.vacaciones" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div> 

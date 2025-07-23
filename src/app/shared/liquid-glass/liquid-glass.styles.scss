@@ -1,0 +1,113 @@
+// Estilos globales para elementos con efecto liquid glass
+.liquid-glass-element {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius, 30px);
+  width: var(--width, 300px);
+  height: var(--height, 200px);
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.liquid-glass-element::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  box-shadow: 
+    inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7), 
+    inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
+}
+
+.liquid-glass-element::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  backdrop-filter: blur(var(--blur-intensity, 10px));
+  filter: var(--filter-url);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+// Efectos de hover
+.liquid-glass-element:hover {
+  transform: scale(1.02);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 2px 2px 0px -2px rgba(255, 255, 255, 0.8);
+}
+
+// Variantes de intensidad
+.liquid-glass-element.intensity-light {
+  --blur-intensity: 5px;
+}
+
+.liquid-glass-element.intensity-medium {
+  --blur-intensity: 10px;
+}
+
+.liquid-glass-element.intensity-heavy {
+  --blur-intensity: 15px;
+}
+
+// Animaciones de fondo
+@keyframes moveBackground {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 0% -1000%;
+  }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+// Clases utilitarias
+.liquid-glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.liquid-glass-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.liquid-glass-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .liquid-glass-element {
+    --width: 250px;
+    --height: 150px;
+    --border-radius: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .liquid-glass-element {
+    --width: 200px;
+    --height: 120px;
+    --border-radius: 15px;
+  }
+} 

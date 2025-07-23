@@ -1,0 +1,143 @@
+<!-- Estado vacío por tab -->
+<div class="mx-auto grid grid-cols-12 gap-4 p-1">
+  <div class="header col-span-12 flex items-center rounded-lg p-4 sm:col-span-12">
+    <h1 class="text-2xl font-bold text-left mr-2 flex items-center">
+      Proyectos
+      <a class="flex items-center text-[#00AAFF] hover:underline ml-4" (click)="showModalNuevoProyecto = true">
+        <img src="/add_simple.svg" alt="Nuevo Proyecto" class="text-[#00AAFF] mr-1" style="width:24px; height:24px;" />
+        <button class="font-medium text-[#00AAFF] underline hover:no-underline" type="button" style="font-size: 12px;">Nuevo proyecto</button>
+      </a>
+    </h1>
+  </div>
+  <div class="col-span-12 rounded-lg p-4 sm:col-span-12">
+    <!-- Tab bar funcional SIEMPRE visible -->
+    <div class="tabs mb-4 border-b-2 border-gray-200 flex">
+      <button class="pb-2 mr-4 font-semibold transition-colors" [ngClass]="{
+          'text-[#00AAFF] border-b-2 border-[#00AAFF]': selectedTab === 'activos',
+          'text-gray-500': selectedTab !== 'activos'
+        }" (click)="selectedTab = 'activos'">
+        Proyectos Activos
+      </button>
+      <button class="pb-2 mr-4 font-semibold transition-colors" [ngClass]="{
+          'text-[#00AAFF] border-b-2 border-[#00AAFF]': selectedTab === 'archivados',
+          'text-gray-500': selectedTab !== 'archivados'
+        }" (click)="selectedTab = 'archivados'">
+        Proyectos Archivados
+      </button>
+      <button class="pb-2 mr-4 font-semibold transition-colors" [ngClass]="{
+          'text-[#00AAFF] border-b-2 border-[#00AAFF]': selectedTab === 'lideres',
+          'text-gray-500': selectedTab !== 'lideres'
+        }" (click)="selectedTab = 'lideres'">
+        Líderes de Equipo
+      </button>
+      <button class="pb-2 mr-4 font-semibold transition-colors" [ngClass]="{
+          'text-[#00AAFF] border-b-2 border-[#00AAFF]': selectedTab === 'colaboradores',
+          'text-gray-500': selectedTab !== 'colaboradores'
+        }" (click)="selectedTab = 'colaboradores'">
+        Colaboradores
+      </button>
+      <button class="pb-2 font-semibold transition-colors" [ngClass]="{
+          'text-[#00AAFF] border-b-2 border-[#00AAFF]': selectedTab === 'catalogos',
+          'text-gray-500': selectedTab !== 'catalogos'
+        }" (click)="selectedTab = 'catalogos'">
+        Catálogos
+      </button>
+    </div>
+    
+    <!-- Contenido para tabs de Proyectos (Activos y Archivados) -->
+    <ng-container *ngIf="selectedTab === 'activos' || selectedTab === 'archivados'">
+      <ng-container *ngIf="proyectosFiltrados.length === 0; else tablaProyectos">
+        <div class="flex flex-col items-center justify-center py-10 px-4">
+          <img src="iconEmptyBox.svg" alt="Sin proyectos" class="w-32 h-32 mb-6" />
+          <p class="text-teal-600 font-semibold text-lg mb-1">
+            <ng-container *ngIf="selectedTab === 'activos'">
+              Aún no tienes ningún proyecto activo registrado.
+            </ng-container>
+            <ng-container *ngIf="selectedTab === 'archivados'">
+              Aún no tienes ningún proyecto archivado.
+            </ng-container>
+          </p>
+          <p class="text-gray-500 mb-6">
+            <ng-container *ngIf="selectedTab === 'activos'">
+              Te invitamos a crear tu primer proyecto
+            </ng-container>
+            <ng-container *ngIf="selectedTab === 'archivados'">
+              Cuando archives un proyecto aparecerá aquí
+            </ng-container>
+          </p>
+          <button class="border-2 border-dashed border-blue-200 rounded-2xl p-6 hover:bg-blue-50 transition"
+            (click)="showModalNuevoProyecto = true">
+            <img src="/add_simple.svg" alt="Agregar Proyecto" class="w-8 h-8 text-blue-300" />
+          </button>
+        </div>
+      </ng-container>
+      <ng-template #tablaProyectos>
+        <table class="min-w-full divide-y">
+          <thead>
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Nombre</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">ID</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap"># Partidas</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap"># Personas</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Presupuesto</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Presupuesto horas</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Inicio</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Fin</th>
+              <th class="px-6 py-3 text-center text-xs font-bold text-black uppercase tracking-wider whitespace-nowrap">Reportes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y">
+            <ng-container *ngFor="let proyecto of proyectosFiltrados">
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-left">
+                  <ng-container *ngIf="selectedTab === 'activos'">
+                    <a [routerLink]="['/home/project-view', proyecto.id]"
+                      class="text-sm font-medium text-[#00AAFF] underline hover:no-underline">
+                      {{ proyecto.nombre }}
+                    </a>
+                  </ng-container>
+                  <ng-container *ngIf="selectedTab === 'archivados'">
+                    <span class="text-sm font-medium text-gray-500">{{ proyecto.nombre }}</span>
+                  </ng-container>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.id }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.partidas }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.personas }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.presupuesto }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.presupuestoReal }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.inicio }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ proyecto.fin }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <button (click)="exportarProyectoExcel(proyecto)">
+                    <img src="/download.svg" alt="Descargar Reporte" class="w-6 h-6 mx-auto cursor-pointer" />
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </ng-template>
+    </ng-container>
+
+    <!-- Vista para Líderes de Equipo -->
+    <ng-container *ngIf="selectedTab === 'lideres'">
+      <app-team-leaders></app-team-leaders>
+    </ng-container>
+
+    <!-- Vista para Colaboradores -->
+    <ng-container *ngIf="selectedTab === 'colaboradores'">
+      <app-collaborators></app-collaborators>
+    </ng-container>
+
+    <!-- Vista para Catálogos -->
+    <ng-container *ngIf="selectedTab === 'catalogos'">
+      <app-catalogs></app-catalogs>
+    </ng-container>
+  </div>
+</div>
+
+<!-- Modal para crear nuevo proyecto -->
+<app-create-project-modal 
+  [(showModalNuevoProyecto)]="showModalNuevoProyecto"
+  (projectCreated)="loadProjects()">
+</app-create-project-modal>

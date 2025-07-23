@@ -1,0 +1,454 @@
+<!-- Fondo general con margen y padding -->
+<div class="min-h-screen min-w-screen"
+     style="background-image: url('hexagonos.svg'), url('Back.png'); background-size: cover, cover; background-position: center, center; background-repeat: repeat, no-repeat;">
+  <div class="flex flex-col md:flex-row gap-4 h-full md:p-6">
+
+    <!-- Sidebar compacto en card glass -->
+    <div class="backdrop-blur-md border border-white/30 rounded-2xl shadow-lg p-0 w-full md:w-60 lg:w-64 flex-shrink-0 min-h-screen"
+         style="background: linear-gradient(to bottom right, rgba(255,255,255,0.3), rgba(248,250,255,0.2));">
+      <aside
+        class="bg-transparent w-full h-full text-gray-800 flex flex-col gap-4 pb-1 text-sm">
+        <!-- PERFIL: imagen + texto -->
+        <div class="flex items-center gap-2 mt-2 px-2">
+          <ng-container *ngIf="user as userData">
+            <img [src]="userData.photo" 
+                 alt="User" 
+                 class="w-8 h-8 rounded-full object-cover shadow border"
+                 [class.image-loading]="imageLoading"
+                 (error)="handleImageError($event)"
+                 (load)="handleImageLoad($event)" />
+            <div>
+              <h2 class="font-medium text-xs text-gray-900 leading-tight">{{ userData.name }}</h2>
+              <p class="text-[10px] text-gray-500 leading-none">{{ userData.role }}</p>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Calendario mensual compacto -->
+        <div class="p-3 text-center">
+          <div class="flex justify-between items-center mb-2 px-1.5">
+            <h3 class="text-xs font-semibold">{{ getMonthName() }} {{ currentYear }}</h3>
+            <div class="flex items-center gap-1.5">
+              <button (click)="prevMonth()" class="text-gray-400 hover:text-black">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button (click)="nextMonth()" class="text-gray-400 hover:text-black">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Días encabezado -->
+          <div class="grid grid-cols-7 gap-0.5 text-[10px] font-semibold text-gray-800 mb-1">
+            <span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sa</span><span>Do</span>
+          </div>
+
+          <!-- Días del mes -->
+          <div class="flex flex-col gap-0.5 text-xs">
+            <div *ngFor="let week of getCalendarWeeks()" class="grid grid-cols-7 rounded-full"
+              [ngClass]="{ 'bg-orange-100': isWeekSelected(week) }">
+
+              <ng-container *ngFor="let cell of week">
+                <span (click)="onSelectCalendarDay(cell)"
+                  class="inline-flex items-center justify-center w-6 h-6 mx-auto text-[10px] font-medium transition-all duration-200 ease-in-out rounded-full cursor-pointer"
+                  [ngClass]="{
+          'bg-orange-500 text-white': cell.date.getDate() === selectedDay && cell.date.getMonth() === currentMonth && cell.date.getFullYear() === currentYear,
+          'text-gray-400': cell.isGray,
+          'text-gray-800': !cell.isGray
+        }">
+                  {{ cell.date.getDate() }}
+                </span>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meta de horas -->
+        <div class="text-[10px] mt-1 px-2">
+          <div class="text-black text-xs font-bold">Q1 / FEB–ABR</div>
+          <div class="mb-0.5">
+            {{ getTotalHours() }}h
+            <strong>({{ getProgressPercentage() | number:'1.0-0' }}%)</strong>
+            de 480h
+          </div>
+          <div class="w-full h-1.5 bg-gray-200 rounded-full">
+            <div class="bg-blue-400 h-1.5 rounded-full" [ngStyle]="{ width: getProgressPercentage() + '%' }"></div>
+          </div>
+        </div>
+
+        <!-- Detalle de horas en card -->
+        <div class="mt-2 space-y-1 text-[11px] px-2">
+          <div *ngFor="let item of getHoursByCategory() | keyvalue" class="flex items-center gap-1.5 p-2">
+            <span class="w-1.5 h-4 rounded-full" [ngStyle]="{ backgroundColor: getColorForKey(item.key) }"></span>
+            <span>{{ item.key }}: <span class="font-bold">{{ item.value }}h</span></span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Main content en card glass -->
+    <div class="flex-1 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg flex flex-col text-gray-800 min-h-screen min-w-screen text-sm p-0"
+         style="background: linear-gradient(to bottom right, rgba(255,255,255,0.3), rgba(248,250,255,0.2));">
+      <main class="bg-transparent flex-1 flex flex-col text-gray-800 min-h-screen min-w-screen text-sm">
+      <!-- Cabecera -->
+      <div class="flex justify-between items-center px-2 pt-2 pb-4">
+        <!-- Flechas + Mes -->
+        <div class="flex items-center gap-2">
+          <button (click)="prevMonth()" class="text-gray-400 hover:text-black transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button (click)="nextMonth()" class="text-gray-400 hover:text-black transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          <h2 class="text-sm font-bold text-gray-900">{{ getMonthName() }}, {{ currentYear }}</h2>
+        </div>
+
+        <!-- Acciones -->
+        <div class="flex items-center gap-6 text-sm">
+          <!-- <div class="relative flex items-center gap-1 text-[#00AAFF] font-medium underline cursor-pointer">
+            <img src="inboxOff.svg" alt="Vista por mes" class="w-6 h-6"
+              style="filter: invert(54%) sepia(65%) saturate(4304%) hue-rotate(178deg) brightness(101%) contrast(101%);" />
+            <span>Solicitudes</span>-->
+          <!-- Badge rojo alineado a la derecha -->
+          <!-- <span class="bg-red-600 text-white rounded-full text-xs px-1.5">0</span>
+          </div> -->
+
+          <button (click)="toggleMonthView()" class="flex items-center gap-1 text-[#00AAFF] underline">
+            <img src="calendar.svg" alt="Vista por mes" class="w-6 h-6"
+              style="filter: invert(54%) sepia(65%) saturate(4304%) hue-rotate(178deg) brightness(101%) contrast(101%);" />
+            {{ showMonthView ? 'Vista por semana' : 'Vista por mes' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Semana activa con estilo visual -->
+      <div *ngIf="!showMonthView" class="flex justify-between items-center px-6 mt-2 mb-4">
+        <button (click)="goToPreviousWeek()" class="text-gray-400 hover:text-black">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <!-- Encabezado de días -->
+        <div class="flex justify-center gap-4 z-10 relative">
+          <ng-container *ngFor="let day of visibleWeek?.days">
+            <div class="flex flex-col items-center min-w-[100px] w-[100px] gap-2">
+              <!-- Día de la semana -->
+              <div [ngClass]="getDayClasses(day.date)"
+                class="rounded-xl text-center text-xs py-2 w-full cursor-pointer font-semibold"
+                [ngStyle]="{ backgroundColor: getDayBackgroundColor(day.date) }"
+                (click)="selectDayFromWeek(day.date)">
+                <div class="text-xs">
+                  {{ dayNames[(day.date.getDay() + 6) % 7] }}
+                </div>
+                <div class="text-base font-bold">{{ day.date | date: 'd' }}</div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <button (click)="goToNextWeek()" class="text-gray-400 hover:text-black">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      <div *ngIf="!showMonthView && allEntries.length > 0" class="relative min-h-[900px]">
+        <!-- Fondo Tiempo por tiempo -->
+        <div class="absolute left-0 w-full h-[500px] bg-white/2 backdrop-blur-sm border border-white/10 z-0 rounded-2xl shadow-sm"
+          [ngStyle]="{ top: '380px' }">
+          <!-- Texto para pantallas grandes (rotado) -->
+          <span class="absolute left-2 md:left-[-40px] top-[160px] text-sm md:text-lg rotate-[-90deg] text-[#94B2C7] font-semibold hidden md:block">
+            Tiempo X Tiempo
+          </span>
+          <!-- Texto para pantallas pequeñas (horizontal) -->
+          <span class="absolute left-6 sm:left-8 top-4 text-xs md:hidden text-[#94B2C7] font-semibold">
+            Tiempo X Tiempo
+          </span>
+        </div>
+
+        <!-- Registros por día -->
+        <div class="flex justify-center gap-4 z-10 relative">
+          <ng-container *ngFor="let day of visibleWeek?.days">
+            <div class="flex flex-col items-center min-w-[100px] w-[100px] gap-2">
+              <!-- Bloques de actividades en mini-card -->
+              <ng-container *ngFor="let entry of day.entries">
+                <div class="rounded-2xl text-center text-xs text-white py-2 w-full cursor-pointer font-semibold relative group"
+                  [ngStyle]="{
+              height: getHeightForHours(entry.hours) + 'px',
+              background: 'linear-gradient(to bottom, ' + getColorForActivity(entry.activity) + ', #44537299)'
+            }" (click)="onEditEntry(entry)">
+                  <div>{{ entry.activity }}</div>
+                  <div *ngIf="entry.projectId" class="text-xs">{{ entry.projectDisplayName }}</div>
+                  <div class="text-[10px]">{{ entry.hours }}h</div>
+                  <!-- Ícono eliminar (centrado abajo, visible al hover) -->
+                  <button (click)="onDeleteEntry(entry, $event)"
+                    class="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition">
+                    <img src="delete.svg" alt="Eliminar" class="w-4 h-4" style="filter: brightness(0);" />
+                  </button>
+                </div>
+              </ng-container>
+
+              <!-- Botón agregar registro -->
+              <button *ngIf="!isFutureDate(day.date)" (click)="openModal(day.date)"
+                class="w-[100px] h-[100px] rounded-2xl flex items-center justify-center border-2 border-dashed border-blue-300 hover:bg-blue-50 transition bg-white/5 backdrop-blur-md border-white/20 shadow"
+                style="opacity: 0.4;">
+                <img src="addCircle.svg" alt="Agregar" class="w-6 h-6" />
+              </button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Vista mensual -->
+      <div *ngIf="showMonthView" class="px-4 py-6 space-y-4">
+
+        <!-- Encabezado de días -->
+        <div class="grid grid-cols-7 text-left text-xs font-semibold text-gray-600">
+          <div *ngFor="let d of ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do']">{{ d }}</div>
+        </div>
+
+        <!-- Celdas del calendario -->
+        <div class="grid grid-cols-7 gap-y-6 gap-x-2 text-left text-sm">
+          <ng-container *ngFor="let day of monthDays">
+            <div class="h-[80px]">
+
+              <!-- Día real o celda en blanco -->
+              <ng-container *ngIf="!day.isBlank; else blankCell">
+                <!-- Número de día -->
+                <div class="mb-3">
+                  <div *ngIf="day.fullDate && isToday(day.fullDate); else regularDay"
+                    class="w-6 h-6 flex items-center justify-center rounded-full text-white text-xs font-medium"
+                    style="background-color: #F55D5D;">
+                    {{ day.date }}
+                  </div>
+                  <ng-template #regularDay>
+                    <div class="text-xs font-medium" [ngClass]="{
+      'text-gray-400': day.isGray,
+      'text-gray-800': !day.isGray
+    }">
+                      {{ day.date }}
+                    </div>
+                  </ng-template>
+                </div>
+
+                <!-- Barras de actividad -->
+                <div *ngFor="let entry of getEntriesForDate(day.fullDate!)" class="h-2 rounded-full mb-1" [ngStyle]="{
+                 width: getBarWidth(entry.hours) + 'px',
+                 backgroundColor: getColorForActivity(entry.activity)
+               }">
+                </div>
+              </ng-container>
+
+              <!-- Celda en blanco -->
+              <ng-template #blankCell>
+                <div class="w-6 h-6"></div>
+              </ng-template>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Mostrar mensaje cuando NO hay registros -->
+      <div *ngIf="!showMonthView && allEntries.length === 0"
+        class="flex flex-col items-center justify-center text-center py-10 px-4 bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl shadow">
+        <img src="iconEmptyBox.svg" alt="Sin registros" class="w-24 h-24 mb-4" />
+        <p class="text-teal-600 font-semibold text-lg mb-1">
+          Aún no tienes ningún registro de horas.
+        </p>
+        <p class="text-gray-500 mb-6">Te invitamos a ingresar tu primer registro</p>
+        <button (click)="openModal()" [disabled]="isFutureDate(selectedDay)"
+          class="border-2 rounded-2xl p-4 hover:bg-blue-50 transition disabled:opacity-30 disabled:cursor-not-allowed border-dashed border-blue-300 bg-white/5 backdrop-blur-md border-white/20 shadow"
+          style="border: 2px dashed rgba(0, 93, 255, 0.3);">
+          <img src="addCircle.svg" alt="Agregar Registro" class="w-6 h-6" style="opacity: 0.3;" />
+        </button>
+      </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de agregar tiempo -->
+<div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+  <div class="bg-white rounded-2xl p-6 w-[320px] shadow-xl relative">
+    <h2 class="text-sm font-bold text-[#00AAFF] mb-4">Agregar tiempo</h2>
+
+    <div class="relative mb-4">
+      <label class="block text-xs font-medium mb-1 text-gray-800">Actividad realizada</label>
+      <div class="border rounded-full w-full bg-white shadow-sm text-sm overflow-hidden"
+        [ngClass]="{ 'rounded-xl border-black': showActivityDropdown, 'border-gray-300': !showActivityDropdown}">
+        <div (click)="showActivityDropdown = !showActivityDropdown"
+          class="px-4 py-2 flex justify-between items-center cursor-pointer">
+          <span [ngClass]="{ 'text-gray-400': !selectedActivity }">
+            {{ selectedActivity || 'Seleccionar actividad' }}
+          </span>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            [ngStyle]="{ transform: showActivityDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div *ngIf="showActivityDropdown">
+          <div *ngFor="let activity of activityOptions" (click)="selectActivity(activity)"
+            class="px-4 py-2 text-sm text-gray-800 hover:bg-indigo-50 cursor-pointer">
+            {{ activity }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedActivity === 'Proyecto'" class="relative mb-4">
+      <label class="block text-xs font-medium mb-1 text-gray-800">Proyecto ID</label>
+      <div class="border border-gray-300 rounded-full w-full bg-white shadow-sm text-sm overflow-hidden"
+        [ngClass]="{ 'rounded-xl border-black': showProjectDropdown, 'border-gray-300': !showProjectDropdown}">
+        <div (click)="showProjectDropdown = !showProjectDropdown"
+          class="px-4 py-2 flex justify-between items-center cursor-pointer">
+          <span [ngClass]="{ 'text-gray-400': !selectedProject }">
+            {{ selectedProject || 'Seleccionar proyecto' }}
+          </span>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            [ngStyle]="{ transform: showProjectDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div *ngIf="showProjectDropdown">
+          <div *ngFor="let project of projects" (click)="selectProject(project)"
+            class="px-4 py-2 text-sm text-gray-800 hover:bg-indigo-50 cursor-pointer">
+            {{ project.displayName }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedActivity === 'Sin asignación'" class="relative mb-4">
+      <label class="block text-xs font-medium mb-1 text-gray-800">Motivo</label>
+      <div class="border border-gray-300 rounded-full w-full bg-white shadow-sm text-sm overflow-hidden"
+        [ngClass]="{ 'rounded-xl border-black': showReasonDropdown, 'border-gray-300': !showReasonDropdown}">
+        <div (click)="showReasonDropdown = !showReasonDropdown"
+          class="px-4 py-2 flex justify-between items-center cursor-pointer">
+          <span [ngClass]="{ 'text-gray-400': !selectedReason }">
+            {{ selectedReason?.displayName || 'Seleccionar motivo' }}
+          </span>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            [ngStyle]="{ transform: showReasonDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div *ngIf="showReasonDropdown">
+          <div *ngFor="let reason of unassignedReasons" (click)="selectReason(reason)"
+            class="px-4 py-2 text-sm text-gray-800 hover:bg-indigo-50 cursor-pointer">
+            {{ reason.displayName }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative mb-4">
+      <label class="block text-xs font-medium mb-1 text-gray-800">Horas invertidas</label>
+      <div class="border border-gray-300 rounded-full w-full bg-white shadow-sm text-sm overflow-hidden"
+        [ngClass]="{ 'rounded-xl border-black': showHoursDropdown, 'border-gray-300': !showHoursDropdown}">
+        <div (click)="showHoursDropdown = !showHoursDropdown"
+          class="px-4 py-2 flex justify-between items-center cursor-pointer">
+          <span [ngClass]="{ 'text-gray-400': !selectedHours }">
+            {{ selectedHours || 'Seleccionar horas' }}
+          </span>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            [ngStyle]="{ transform: showHoursDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div *ngIf="showHoursDropdown">
+          <div *ngFor="let hour of hourOptions" (click)="selectHours(hour)"
+            class="px-4 py-2 text-sm text-gray-800 hover:bg-indigo-50 cursor-pointer">
+            {{ hour }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="shouldShowOvertimeCombo()" class="relative mb-4">
+      <div class="flex items-center gap-2 text-black font-semibold text-sm">
+        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+        <span>Horas de tiempo x tiempo</span>
+      </div>
+
+      <label class="block text-xs font-medium mb-1">Motivo</label>
+      <div class="border border-gray-300 rounded-full w-full bg-white shadow-sm text-sm overflow-hidden"
+        [ngClass]="{ 'rounded-xl border-black': showExtraReasonDropdown, 'border-gray-300': !showExtraReasonDropdown}">
+        <div (click)="showExtraReasonDropdown = !showExtraReasonDropdown"
+          class="px-4 py-2 flex justify-between items-center cursor-pointer">
+          <span [ngClass]="{ 'text-gray-400': !selectedExtraReason }">
+            {{ selectedExtraReason?.displayName || 'Seleccionar motivo' }}
+          </span>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            [ngStyle]="{ transform: showExtraReasonDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div *ngIf="showExtraReasonDropdown">
+          <div *ngFor="let reason of extraHoursReasons" (click)="selectExtraReason(reason)"
+            class="px-4 py-2 text-sm text-gray-800 hover:bg-indigo-50 cursor-pointer">
+            {{ reason.displayName }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <!-- Mensaje de error en texto rojo -->
+      <div *ngIf="errorMessage" class="text-red-600 text-sm font-semibold mb-2 text-center">
+        {{ errorMessage }}
+      </div>
+      <button (click)="submitTimeEntry()"
+        class="bg-indigo-600 text-white rounded-full py-2 font-semibold hover:bg-indigo-700 transition">
+        Aplicar
+      </button>
+      <button (click)="cancelEntry()"
+        class="border border-indigo-600 text-indigo-600 rounded-full py-2 font-semibold hover:bg-indigo-50 transition">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmación de éxito -->
+<div *ngIf="showSuccess" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+  <div class="bg-white rounded-2xl p-6 w-[320px] shadow-xl text-center">
+    <h2 class="text-sm font-bold text-blue-700 mb-4">Agregar tiempo</h2>
+    <div class="flex justify-center mb-4">
+      <svg class="w-12 h-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <p class="font-semibold text-sm text-gray-800">¡Tus horas se han registrado con éxito!</p>
+    <p class="text-xs text-gray-500 mt-2">Ahora serán enviadas a tu líder de proyecto para su aprobación.</p>
+    <button (click)="acknowledgeSuccess()"
+      class="mt-6 w-full bg-indigo-600 text-white rounded-full py-2 font-semibold hover:bg-indigo-700">
+      Entendido
+    </button>
+  </div>
+</div>
+
+<!-- Modal de error -->
+<div *ngIf="showErrorModal" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40">
+  <div class="bg-gray-200 bg-opacity-60 rounded-2xl shadow-lg p-8 flex flex-col items-center max-w-xs w-full">
+    <div class="text-xl font-bold text-center mb-2">¡Ups! Algo salió mal</div>
+    <div class="flex items-center justify-center mb-4">
+      <div class="rounded-full bg-blue-600 flex items-center justify-center w-16 h-16">
+        <svg width="40" height="40" viewBox="0 0 40 40"><line x1="12" y1="12" x2="28" y2="28" stroke="white" stroke-width="4" stroke-linecap="round"/><line x1="28" y1="12" x2="12" y2="28" stroke="white" stroke-width="4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div class="text-left text-gray-700 mb-6">
+      Parece que tuvimos un problema inesperado. Intenta de nuevo en unos minutos, por favor.
+    </div>
+    <button (click)="showErrorModal = false" class="bg-blue-900 text-white rounded-lg px-6 py-2 font-semibold">Entendido</button>
+  </div>
+</div>

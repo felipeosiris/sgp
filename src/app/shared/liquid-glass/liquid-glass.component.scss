@@ -1,0 +1,70 @@
+.liquid-glass-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius, 30px);
+  width: var(--width, 300px);
+  height: var(--height, 200px);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.liquid-glass-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  box-shadow: 
+    inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7), 
+    inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
+}
+
+.liquid-glass-container::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  backdrop-filter: blur(var(--blur-intensity, 0px));
+  filter: url(var(--filter-url));
+  overflow: hidden;
+  isolation: isolate;
+}
+
+// Variantes del efecto
+.liquid-glass-container.glass-light {
+  --blur-intensity: 5px;
+  --filter-url: url(#liquid-glass-filter-light);
+}
+
+.liquid-glass-container.glass-medium {
+  --blur-intensity: 10px;
+  --filter-url: url(#liquid-glass-filter-medium);
+}
+
+.liquid-glass-container.glass-heavy {
+  --blur-intensity: 15px;
+  --filter-url: url(#liquid-glass-filter-heavy);
+}
+
+// Efecto de hover
+.liquid-glass-container:hover {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+
+// Animación de fondo (opcional)
+.liquid-glass-container.animated-bg {
+  background: linear-gradient(45deg, #f0f0f0, #e0e0e0, #f0f0f0);
+  background-size: 400% 400%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+} 

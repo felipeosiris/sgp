@@ -1,0 +1,97 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <!-- Encabezado -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Notificaciones</h1>
+      <p class="text-gray-600 mt-1">
+        {{ unreadCount }} notificaciones sin leer
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <button 
+        (click)="reloadNotifications()"
+        [disabled]="isLoading"
+        class="px-4 py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        <svg *ngIf="isLoading" class="w-4 h-4 animate-spin inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        {{ isLoading ? 'Cargando...' : 'Actualizar' }}
+      </button>
+      <button 
+        *ngIf="unreadCount > 0"
+        (click)="markAllAsRead()"
+        [disabled]="isLoading"
+        class="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        Marcar todas como leídas
+      </button>
+    </div>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="isLoading && notifications.length === 0" 
+       class="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
+    <svg class="w-16 h-16 mx-auto text-gray-400 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+    </svg>
+    <h3 class="mt-4 text-lg font-medium text-gray-900">Cargando notificaciones...</h3>
+    <p class="mt-1 text-gray-500">Por favor espera mientras obtenemos tus notificaciones.</p>
+  </div>
+
+  <!-- Lista de notificaciones -->
+  <div *ngIf="!isLoading || notifications.length > 0" class="space-y-4">
+    <div *ngFor="let notification of notifications" 
+         (click)="onNotificationClick(notification)"
+         [class.bg-blue-50]="!notification.isRead"
+         class="p-6 rounded-xl border border-gray-200 transition-all hover:shadow-md hover:border-gray-300 cursor-pointer">
+      <div class="flex items-start gap-4">
+        <!-- Icono según el tipo -->
+        <div [ngClass]="{
+          'bg-green-100 text-green-600': notification.type === 'APROBACION',
+          'bg-red-100 text-red-600': notification.type === 'RECHAZO',
+          'bg-blue-100 text-blue-600': notification.type === 'ASIGNACION',
+          'bg-orange-100 text-orange-600': notification.type === 'RECORDATORIO'
+        }" class="p-3 rounded-full">
+          <svg *ngIf="notification.type === 'APROBACION'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <svg *ngIf="notification.type === 'RECHAZO'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          <svg *ngIf="notification.type === 'ASIGNACION'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          <svg *ngIf="notification.type === 'RECORDATORIO'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+
+        <!-- Contenido -->
+        <div class="flex-1">
+          <p class="text-gray-800 font-medium">{{ notification.message }}</p>
+          <div class="flex items-center gap-4 mt-2">
+            <span class="text-sm text-gray-500">
+              {{ formatDate(notification.creationDate) }}
+            </span>
+            <button 
+              *ngIf="!notification.isRead"
+              (click)="markAsRead(notification.id); $event.stopPropagation()"
+              class="text-sm text-blue-600 hover:text-blue-800">
+              Marcar como leída
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!isLoading && notifications.length === 0" 
+         class="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
+      <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+      </svg>
+      <h3 class="mt-4 text-lg font-medium text-gray-900">No hay notificaciones</h3>
+      <p class="mt-1 text-gray-500">Cuando tengas notificaciones, aparecerán aquí.</p>
+    </div>
+  </div>
+</div> 

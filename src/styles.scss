@@ -1,0 +1,19 @@
+/* You can add global styles to this file, and also import other style files */
+/* Configuración global */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body,
+html {
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Aplicar Poppins a todos los elementos de texto comunes */
+h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Liquid Glass Effect Styles */
+@import './app/shared/liquid-glass/liquid-glass.styles.scss';

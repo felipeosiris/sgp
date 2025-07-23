@@ -1,0 +1,15 @@
+<!-- component -->
+<div class="flex h-screen bg-white text-gray-900 overflow-hidden">
+  <!-- Sidebar fijo -->
+  <div class="fixed left-0 top-0 h-screen p-4 w-28 z-50 shadow-md">
+    <app-sidemenu></app-sidemenu>
+  </div>
+
+  <!-- Contenido principal con margen a la derecha del sidebar -->
+  <div class="ml-28 flex-1 overflow-y-auto p-4">
+    @if (!hayRutaHija) {
+      <app-myTime></app-myTime>
+    }
+    <router-outlet></router-outlet>
+  </div>
+</div>
